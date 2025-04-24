@@ -1,4 +1,3 @@
-import { D } from "vitest/dist/chunks/reporters.d.CqBhtcTq.js";
 import Cliente from "./Cliente.js";
 import ElementoAlmacen from "./ElementoAlmacen.js";
 import { Entidad } from "./Entidad.js";
