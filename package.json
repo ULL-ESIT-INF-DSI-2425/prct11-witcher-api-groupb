@@ -19,7 +19,9 @@
   "description": "Práctica de la asignatura DSI en el curso 2024/2025",
   "dependencies": {
     "chalk": "^5.4.1",
+    "dotenv": "^16.5.0",
     "express": "^5.1.0",
+    "mongoose": "^8.13.3",
     "tsc-watch": "^6.2.1",
     "yargs": "^17.7.2"
   },
