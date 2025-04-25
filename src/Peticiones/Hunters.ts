@@ -27,11 +27,12 @@ router.get('/', async (_, res) => {
 // Buscar por nombre
 router.get('/search', async (req, res) => {
   try {
-    const nombre = req.query.nombre as string;
-    if (!nombre) return res.json({ error: 'Falta el nombre' });
+    console.log(req.query);
+    const nombre = typeof req.query.nombre === 'string' ? req.query.nombre : '';
+    if (!nombre) res.json({ error: 'Falta el nombre' });
 
     const hunter = await Hunter.findOne({ nombre });
-    if (!hunter) return res.json({ error: 'No encontrado' });
+    if (!hunter) res.json({ error: 'No encontrado' });
 
     res.json(hunter);
   } catch (error) {
@@ -43,7 +44,7 @@ router.get('/search', async (req, res) => {
 router.get('/:id', async (req, res) => {
   try {
     const hunter = await Hunter.findById(req.params.id);
-    if (!hunter) return res.json({ error: 'No encontrado' });
+    if (!hunter) res.json({ error: 'No encontrado' });
 
     res.json(hunter);
   } catch (error) {
@@ -55,7 +56,7 @@ router.get('/:id', async (req, res) => {
 router.patch('/:id', async (req, res) => {
   try {
     const hunter = await Hunter.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
-    if (!hunter) return res.json({ error: 'No encontrado' });
+    if (!hunter) res.json({ error: 'No encontrado' });
 
     res.json(hunter);
   } catch (error) {
@@ -67,12 +68,13 @@ router.patch('/:id', async (req, res) => {
 router.delete('/:id', async (req, res) => {
   try {
     const hunter = await Hunter.findByIdAndDelete(req.params.id);
-    if (!hunter) return res.json({ error: 'No encontrado' });
+    if (!hunter) res.json({ error: 'No encontrado' });
 
     res.json({ mensaje: 'Eliminado' });
   } catch (error) {
     res.json({ error: (error as Error).message });
   }
 });
+
 
 export default router;
