@@ -25,11 +25,18 @@ router.get('/', async (_, res) => {
   }
 });
 
-// Obtener por nombre
-router.get('/:nombre', async (req, res) => {
-  const filter = req.params.nombre
-    ? { nombre: req.params.nombre.toString() }
-    : {};
+// Obtener
+router.get('/', async (req, res) => {
+
+  let filter;
+  if (req.query.nombre) {
+    filter = { nombre: req.query.nombre.toString() };
+  } else if (req.query._id) {
+    filter = { _id: req.query._id };
+  }
+  else {
+    filter = {};
+  }
 
   try {
     const hunters = await Hunter.find(filter);
@@ -44,10 +51,16 @@ router.get('/:nombre', async (req, res) => {
   }
 });
 
-// Obtener por ID
-router.get('/:id', async (req, res) => {
+
+// Modificar
+router.patch('/', async (req, res) => {
+  const filter = req.body.nombre ? { nombre: req.body.nombre.toString() } : { _id: req.body._id };
+  if(!filter) {
+    res.status(400).send({ error: 'Falta el nombre o id' });
+  }
+
   try {
-    const hunter = await Hunter.findById(req.params.id);
+    const hunter = await Hunter.findOneAndUpdate({ filter }, req.body, { new: true, runValidators: true });
     if(!hunter) {
       res.status(404).send({ error: 'No encontrado' });
     }
@@ -58,95 +71,17 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// Modificar por ID
-router.patch('/:id', async (req, res) => {
+
+// Borrar
+router.delete('/', async (req, res) => {
+  const filter = req.body.nombre ? { nombre: req.body.nombre.toString() } : { _id: req.body._id };
+  if(!filter) {
+    res.status(400).send({ error: 'Falta el nombre o id' });
+ }
+
   try {
-    const allowedUpdates = Object.keys(Hunter.schema.paths).filter((key) => key !== 'ID');
-    const actualUpdates = Object.keys(req.body);
-    const isValidUpdate = actualUpdates.every((update) =>
-      allowedUpdates.includes(update),
-    );
 
-    if (!isValidUpdate) {
-      res.status(400).send({
-        error: "Update is not permitted",
-      });
-    } else {
-      const hunter = await Hunter.findByIdAndUpdate(
-        req.params.id,
-        req.body,
-        {
-          new: true,
-          runValidators: true,
-        },
-      )
-
-      if (hunter) {
-        res.send(hunter);
-      } else {
-        res.status(404).send();
-      }
-    }
-  } catch (error) {
-    res.status(500).send(error);
-  }
-});
-
-    /** 
-    const hunter = await Hunter.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
-    if(!hunter) {
-      res.status(404).send({ error: 'No encontrado' });
-    }
-
-    res.send(hunter);
-  } catch (error) {
-    res.status(500).send({ error });
-  }
-});
-*/
-
-// Modificar por nombre
-router.patch('/:nombre', async (req, res) => {
-  try {
-    const nombre = typeof req.params.nombre === 'string';
-    if(!nombre) {
-      res.status(400).send({ error: 'Falta el nombre' });
-    }
-
-    const hunter = await Hunter.findOneAndUpdate({ nombre }, req.body, { new: true, runValidators: true });
-    if(!hunter) {
-      res.status(404).send({ error: 'No encontrado' });
-    }
-
-    res.send(hunter);
-  } catch (error) {
-    res.status(500).send({ error });
-  }
-});
-
-// Borrar por ID
-router.delete('/:id', async (req, res) => {
-  try {
-    const hunter = await Hunter.findByIdAndDelete(req.params.id);
-    if(!hunter) {
-      res.status(404).send({ error: 'No encontrado' });
-    }
-
-    res.send({ mensaje: 'Eliminado' });
-  } catch (error) {
-    res.status(500).send({ error });
-  }
-});
-
-// Borrar por nombre
-router.delete('/:nombre', async (req, res) => {
-  try {
-    const nombre = typeof req.params.nombre === 'string';
-    if(!nombre) {
-      res.status(400).send({ error: 'Falta el nombre' });
-    }
-
-    const hunter = await Hunter.findOneAndDelete({ nombre });
+    const hunter = await Hunter.findOneAndDelete({ filter });
     if(!hunter) {
       res.status(404).send({ error: 'No encontrado' });
     }
