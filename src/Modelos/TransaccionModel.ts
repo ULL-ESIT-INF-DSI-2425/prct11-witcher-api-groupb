@@ -2,6 +2,16 @@ import mongoose from 'mongoose';
 import elementoAlmacenSchema from './ElementoAlmacenModel.js';
 
 const transaccionSchema = new mongoose.Schema({
+  ID: {
+    type: Number,
+    required: true,
+    trim: true,
+    unique: true,
+    validate: {
+      validator: Number.isInteger,
+      message: '{VALUE} no es un número entero'
+    }
+  },
   fecha: {
     type: Date,
     default: Date.now
