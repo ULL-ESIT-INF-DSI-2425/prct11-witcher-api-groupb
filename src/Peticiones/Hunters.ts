@@ -8,9 +8,9 @@ router.post('/', async (req, res) => {
   try {
     const hunter = new Hunter(req.body);
     await hunter.save();
-    res.json(hunter);
+    res.send(hunter);
   } catch (error) {
-    res.json({ error: (error as Error).message });
+    res.status(400).send(error);
   }
 });
 
@@ -18,9 +18,9 @@ router.post('/', async (req, res) => {
 router.get('/', async (_, res) => {
   try {
     const hunters = await Hunter.find();
-    res.json(hunters);
+    res.send(hunters);
   } catch (error) {
-    res.json({ error: (error as Error).message });
+    res.status(500).send(error);
   }
 });
 
@@ -29,14 +29,18 @@ router.get('/search', async (req, res) => {
   try {
     console.log(req.query);
     const nombre = typeof req.query.nombre === 'string' ? req.query.nombre : '';
-    if (!nombre) res.json({ error: 'Falta el nombre' });
+    if(!nombre) {
+      res.status(400).send({ error: 'Falta el nombre' });
+    }
 
     const hunter = await Hunter.findOne({ nombre });
-    if (!hunter) res.json({ error: 'No encontrado' });
+    if(!hunter) {
+      res.status(404).send({ error: 'No encontrado' });
+    }
 
-    res.json(hunter);
+    res.send(hunter);
   } catch (error) {
-    res.json({ error: (error as Error).message });
+    res.status(500).send({ error });
   }
 });
 
@@ -44,11 +48,13 @@ router.get('/search', async (req, res) => {
 router.get('/:id', async (req, res) => {
   try {
     const hunter = await Hunter.findById(req.params.id);
-    if (!hunter) res.json({ error: 'No encontrado' });
+    if(!hunter) {
+      res.status(404).send({ error: 'No encontrado' });
+    }
 
-    res.json(hunter);
+    res.send(hunter);
   } catch (error) {
-    res.json({ error: (error as Error).message });
+    res.status(500).send({ error });
   }
 });
 
@@ -56,11 +62,13 @@ router.get('/:id', async (req, res) => {
 router.patch('/:id', async (req, res) => {
   try {
     const hunter = await Hunter.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
-    if (!hunter) res.json({ error: 'No encontrado' });
+    if(!hunter) {
+      res.status(404).send({ error: 'No encontrado' });
+    }
 
-    res.json(hunter);
+    res.send(hunter);
   } catch (error) {
-    res.json({ error: (error as Error).message });
+    res.status(500).send({ error });
   }
 });
 
@@ -68,12 +76,18 @@ router.patch('/:id', async (req, res) => {
 router.delete('/:id', async (req, res) => {
   try {
     const hunter = await Hunter.findByIdAndDelete(req.params.id);
-    if (!hunter) res.json({ error: 'No encontrado' });
+    if(!hunter) {
+      res.status(404).send({ error: 'No encontrado' });
+    }
 
-    res.json({ mensaje: 'Eliminado' });
+    res.send({ mensaje: 'Eliminado' });
   } catch (error) {
-    res.json({ error: (error as Error).message });
+    res.status(500).send({ error });
   }
+});
+
+router.all('/{*splat}', (_, res) => {
+  res.status(501).send();
 });
 
 
