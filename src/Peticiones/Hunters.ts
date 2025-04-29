@@ -24,7 +24,7 @@ router.get('/', async (_, res) => {
   }
 });
 
-// Buscar por nombre
+// Obtener por nombre
 router.get('/search', async (req, res) => {
   try {
     console.log(req.query);
@@ -72,10 +72,48 @@ router.patch('/:id', async (req, res) => {
   }
 });
 
+// Modificar por nombre
+router.patch('/search', async (req, res) => {
+  try {
+    const nombre = typeof req.query.nombre === 'string';
+    if(!nombre) {
+      res.status(400).send({ error: 'Falta el nombre' });
+    }
+
+    const hunter = await Hunter.findOneAndUpdate({ nombre }, req.body, { new: true, runValidators: true });
+    if(!hunter) {
+      res.status(404).send({ error: 'No encontrado' });
+    }
+
+    res.send(hunter);
+  } catch (error) {
+    res.status(500).send({ error });
+  }
+});
+
 // Borrar por ID
 router.delete('/:id', async (req, res) => {
   try {
     const hunter = await Hunter.findByIdAndDelete(req.params.id);
+    if(!hunter) {
+      res.status(404).send({ error: 'No encontrado' });
+    }
+
+    res.send({ mensaje: 'Eliminado' });
+  } catch (error) {
+    res.status(500).send({ error });
+  }
+});
+
+// Borrar por nombre
+router.delete('/search', async (req, res) => {
+  try {
+    const nombre = typeof req.query.nombre === 'string';
+    if(!nombre) {
+      res.status(400).send({ error: 'Falta el nombre' });
+    }
+
+    const hunter = await Hunter.findOneAndDelete({ nombre });
     if(!hunter) {
       res.status(404).send({ error: 'No encontrado' });
     }
