@@ -18,7 +18,7 @@ app.use('/merchants', merchantsRouter);
 
 // Control
 app.use((_req, res) => {
-    res.json({ error: 'Ruta no encontrada' });
+    res.status(404).send({ error: 'Ruta no encontrada' });
   });
 
 app.listen(port, () => {
