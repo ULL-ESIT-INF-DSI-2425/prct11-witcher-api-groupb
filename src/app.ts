@@ -1,5 +1,5 @@
 import express from 'express';
-import './mongoose.js'; // Se conecta a MongoDB local
+import './db/mongoose.js'; // Se conecta a MongoDB local
 
 // Routers: 
 import { defaultRouter } from "./routers/default.js";
