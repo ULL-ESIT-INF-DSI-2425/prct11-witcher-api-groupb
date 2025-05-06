@@ -1,10 +1,10 @@
 import express from 'express';
-import Hunter from '../Modelos/HuntersModel.js';
+import Hunter from '../models/HuntersModel.js';
 
 const router = express.Router();
 
 // Crear
-router.post('/', async (req, res) => {
+router.post('/hunters', async (req, res) => {
   const hunter = new Hunter(req.body);
 
   try {
@@ -15,18 +15,8 @@ router.post('/', async (req, res) => {
   }
 });
 
-// Obtener todos
-router.get('/', async (_, res) => {
-  try {
-    const hunters = await Hunter.find();
-    res.send(hunters);
-  } catch (error) {
-    res.status(500).send(error);
-  }
-});
-
 // Obtener
-router.get('/', async (req, res) => {
+router.get('/hunters', async (req, res) => {
 
   let filter;
   if (req.query.nombre) {
@@ -53,7 +43,7 @@ router.get('/', async (req, res) => {
 
 
 // Modificar
-router.patch('/', async (req, res) => {
+router.patch('/hunters', async (req, res) => {
   const filter = req.body.nombre ? { nombre: req.body.nombre.toString() } : { _id: req.body._id };
   if(!filter) {
     res.status(400).send({ error: 'Falta el nombre o id' });
@@ -73,7 +63,7 @@ router.patch('/', async (req, res) => {
 
 
 // Borrar
-router.delete('/', async (req, res) => {
+router.delete('/hunters', async (req, res) => {
   const filter = req.body.nombre ? { nombre: req.body.nombre.toString() } : { _id: req.body._id };
   if(!filter) {
     res.status(400).send({ error: 'Falta el nombre o id' });
@@ -90,10 +80,6 @@ router.delete('/', async (req, res) => {
   } catch (error) {
     res.status(500).send({ error });
   }
-});
-
-router.all('/{*splat}', (_, res) => {
-  res.status(501).send();
 });
 
 

@@ -1,10 +1,10 @@
 import express from 'express';
-import Merchant from '../Modelos/MerchantModel.js';
+import Merchant from '../models/MerchantModel.js';
 
 const router = express.Router();
 
 // Crear
-router.post('/', async (req, res) => {
+router.post('/merchants', async (req, res) => {
   const merchant = new Merchant(req.body);
 
   try {
@@ -16,7 +16,7 @@ router.post('/', async (req, res) => {
 });
 
 // Obtener todos
-router.get('/', async (_, res) => {
+router.get('/merchants', async (_, res) => {
   try {
     const merchant = await Merchant.find();
     res.send(merchant);
@@ -26,7 +26,7 @@ router.get('/', async (_, res) => {
 });
 
 // Obtener
-router.get('/', async (req, res) => {
+router.get('/merchants', async (req, res) => {
 
   let filter;
   if (req.query.nombre) {
@@ -53,7 +53,7 @@ router.get('/', async (req, res) => {
 
 
 // Modificar
-router.patch('/', async (req, res) => {
+router.patch('/merchants', async (req, res) => {
   const filter = req.body.nombre ? { nombre: req.body.nombre.toString() } : { _id: req.body._id };
   if(!filter) {
     res.status(400).send({ error: 'Falta el nombre o id' });
@@ -73,7 +73,7 @@ router.patch('/', async (req, res) => {
 
 
 // Borrar
-router.delete('/', async (req, res) => {
+router.delete('/merchants', async (req, res) => {
   const filter = req.body.nombre ? { nombre: req.body.nombre.toString() } : { _id: req.body._id };
   if(!filter) {
     res.status(400).send({ error: 'Falta el nombre o id' });
@@ -90,10 +90,6 @@ router.delete('/', async (req, res) => {
   } catch (error) {
     res.status(500).send({ error });
   }
-});
-
-router.all('/{*splat}', (_, res) => {
-  res.status(501).send();
 });
 
 export default router;
