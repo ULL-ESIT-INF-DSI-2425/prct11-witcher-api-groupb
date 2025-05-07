@@ -11,7 +11,7 @@ router.post('/bienes', async (req, res) => {
     await bien.save();
     res.status(201).send(bien);
   } catch (error) {
-    res.status(400).send({ error: (error as Error).message });
+    res.status(500).send(error);
   }
 });
 
@@ -32,7 +32,7 @@ router.get('/bienes', async (req, res) => {
     }
     res.send(bienes);
   } catch (error) {
-    res.status(500).send({ error: (error as Error).message });
+    res.status(500).send(error);
   }
 });
 
@@ -56,7 +56,7 @@ router.patch('/bienes', async (req, res) => {
 
     res.send(bien);
   } catch (error) {
-    res.status(500).send({ error: (error as Error).message });
+    res.status(500).send(error);
   }
 });
 
@@ -77,7 +77,7 @@ router.delete('/bienes', async (req, res) => {
 
     res.send({ mensaje: 'Bien eliminado correctamente' });
   } catch (error) {
-    res.status(500).send({ error: (error as Error).message });
+    res.status(500).send(error);
   }
 });
 

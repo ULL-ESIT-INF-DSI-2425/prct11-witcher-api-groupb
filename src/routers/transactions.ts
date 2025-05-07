@@ -61,7 +61,7 @@ router.post('/transactions', async (req, res) => {
     await transaccion.save();
     res.status(201).send(transaccion);
   } catch (error) {
-    res.status(500).send({ error: (error as Error).message });
+    res.status(500).send(error);
   }
 });
 
@@ -107,7 +107,7 @@ router.get('/transactions', async (req, res) => {
 
     res.send(transacciones);
   } catch (error) {
-    res.status(500).send({ error: (error as Error).message });
+    res.status(500).send(error);
   }
 });
 
@@ -154,7 +154,7 @@ router.patch('/transactions', async (req, res) => {
 
     res.send(transaccion);
   } catch (error) {
-    res.status(500).send({ error: (error as Error).message });
+    res.status(500).send(error);
   }
 });
 
@@ -190,7 +190,7 @@ router.delete('/transactions', async (req, res) => {
 
     res.send({ mensaje: 'Transacción eliminada y stock actualizado' });
   } catch (error) {
-    res.status(500).send({ error: (error as Error).message });
+    res.status(500).send(error);
   }
 });
 
