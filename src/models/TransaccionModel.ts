@@ -28,7 +28,7 @@ const transaccionSchema = new mongoose.Schema({
   tipoPersona: {
     type: String,
     required: true,
-    enum: ['Hunter', 'Merchant']
+    enum: ['HuntersModel', 'MerchantsModel']
   },
   devolucion: {
     type: Boolean,

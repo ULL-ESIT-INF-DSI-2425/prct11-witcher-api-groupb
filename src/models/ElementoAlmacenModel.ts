@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 const elementoAlmacenSchema = new mongoose.Schema({
   bien: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Bien',
+    ref: 'BienModel',
     required: true
   },
   cantidad: {
