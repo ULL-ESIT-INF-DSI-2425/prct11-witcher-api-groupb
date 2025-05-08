@@ -29,7 +29,6 @@ router.get("/merchants", async (req, res) => {
 
   try {
     const merchant = await Merchant.find(filter);
-
     if (merchant.length !== 0) {
       res.send(merchant);
     } else {

@@ -9,7 +9,6 @@ import transactionsRouter from "./routers/transactions.js";
 import bienRouter from "./routers/bien.js";
 
 export const app = express();
-// const port = 3000;
 
 app.use(express.json());
 
