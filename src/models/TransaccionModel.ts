@@ -25,6 +25,7 @@ const transaccionSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       refPath: "tipoPersona",
       required: true,
+      default: null,
     },
     tipoPersona: {
       type: String,

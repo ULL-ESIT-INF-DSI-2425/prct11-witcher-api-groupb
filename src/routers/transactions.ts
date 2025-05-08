@@ -48,6 +48,7 @@ router.post("/transactions", async (req, res) => {
     await bien.save();
 
     const transaccion = new Transaccion({
+      ID: req.body.ID,
       persona: persona._id,
       tipoPersona: tipoModelo,
       bienes: {
@@ -96,8 +97,7 @@ router.get("/transactions", async (req, res) => {
       };
     }
 
-    const transacciones =
-      await Transaccion.find(filter).populate("bienes.bien");
+    const transacciones = await Transaccion.find(filter).populate("bienes");
 
     if (!transacciones.length) {
       res.status(404).send({ error: "No hay transacciones" });
@@ -120,7 +120,7 @@ router.patch("/transactions", async (req, res) => {
   }
 
   try {
-    const transaccion = await Transaccion.findById(_id).populate("bienes.bien");
+    const transaccion = await Transaccion.findById(_id).populate("bienes");
 
     if (!transaccion) {
       res.status(404).send({ error: "Transacción no encontrada" });
@@ -166,7 +166,7 @@ router.delete("/transactions", async (req, res) => {
   }
 
   try {
-    const transaccion = await Transaccion.findById(_id).populate("bienes.bien");
+    const transaccion = await Transaccion.findById(_id).populate("bienes");
     if (!transaccion) {
       res.status(404).send({ error: "Transacción no encontrada" });
       return;

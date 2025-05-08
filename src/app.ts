@@ -1,16 +1,5 @@
 import express from "express";
-import mongoose from "mongoose";
-
-const MONGO_URL =
-  process.env.MONGO_URL || "mongodb://127.0.0.1:27017/posada-app";
-
-// Middleware para manejar errores
-if (process.env.NODE_ENV !== "test") {
-  mongoose
-    .connect(MONGO_URL)
-    .then(() => console.log("✅ Connected to the database"))
-    .catch(() => console.log("❌ Error connecting to the database"));
-}
+import './db/mongoose.js';
 
 // Routers:
 import { defaultRouter } from "./routers/default.js";

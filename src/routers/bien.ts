@@ -4,16 +4,22 @@ import Bien from "../models/BienModel.js";
 const router = express.Router();
 
 // Crear bien
-router.post("/bienes", async (req, res) => {
-  const bien = new Bien(req.body);
-
+router.post('/bienes', async (req, res) => {
   try {
+    const bien = new Bien(req.body);
     await bien.save();
     res.status(201).send(bien);
-  } catch (error) {
-    res.status(500).send(error);
-  }
+  } catch (error: any) {
+    if (error.code === 11000) {
+      res.status(400).send({ error: 'ID duplicado' });
+    } else if (error.name === 'ValidationError') {
+      res.status(400).send(error);
+    } else {
+      res.status(500).send(error);
+    }
+  }  
 });
+
 
 // Obtener bien-bienes
 router.get("/bienes", async (req, res) => {

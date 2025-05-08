@@ -1,65 +1,87 @@
-import mongoose from "mongoose";
-import request from "supertest";
-import type { Express } from "express";
-import { describe, test, expect, beforeAll, afterAll } from "vitest";
+import request from 'supertest';
+import { describe, test, expect } from 'vitest';
+import { app } from '../src/app.js';
 
-let app: Express;
-const baseURL = "/hunters";
-let createdId: string;
+describe('Pruebas de la API de Hunters', () => {
+  const hunterData = {
+    ID: 1001,
+    nombre: 'Gustavo',
+    raza: 'Humano',
+    ubicacion: 'Candelaria'
+  };
 
-beforeAll(async () => {
-  // 1) Conecta a la base de datos de test
-  await mongoose.connect(process.env.MONGO_URL!);
+  test('Crear un nuevo hunter', async () => {
+    const response = await request(app)
+      .post('/hunters')
+      .send(hunterData);
 
-  // 2) Limpia la BD entera
-  await mongoose.connection.db!.dropDatabase();
-
-  // 3) Importa la app una vez que la conexión está lista
-  //    omitimos la extensión para que Vitest resuelva TS <-> JS
-  const mod = await import("../src/app");
-  app = mod.app;
-});
-
-afterAll(async () => {
-  await mongoose.connection.close();
-});
-
-describe("Rutas /hunters", () => {
-  test("POST   /hunters        → crea un cazador", async () => {
-    const res = await request(app).post(baseURL).send({
-      ID: 1,
-      nombre: "Geralt",
-      raza: "Humano",
-      ubicacion: "Kaer Morhen",
-    });
-    expect(res.status).toBe(200);
-    expect(res.body).toHaveProperty("_id");
-    createdId = res.body._id;
+    expect(response.status).toBe(200);
+    expect(response.body.nombre).toBe(hunterData.nombre);
+    expect(response.body.ID).toBe(hunterData.ID);
   });
 
-  test("GET    /hunters?_id=id  → devuelve el cazador creado", async () => {
-    const res = await request(app).get(`${baseURL}?_id=${createdId}`);
-    expect(res.status).toBe(200);
-    expect(Array.isArray(res.body)).toBe(true);
-    expect(res.body[0]).toMatchObject({ nombre: "Geralt" });
+  test('Obtener un hunter por nombre', async () => {
+    const response = await request(app)
+      .get('/hunters')
+      .query({ nombre: hunterData.nombre });
+
+    expect(response.status).toBe(200);
+    expect(response.body[0].nombre).toBe(hunterData.nombre);
   });
 
-  test("PATCH  /hunters        → actualiza el cazador", async () => {
-    const res = await request(app)
-      .patch(baseURL)
-      .send({ _id: createdId, ubicacion: "Novigrado" });
-    expect(res.status).toBe(200);
-    expect(res.body.ubicacion).toBe("Novigrado");
+  test('Modificar un hunter por nombre', async () => {
+    // Crear hunter
+    const nuevoHunter = {
+      ID: 1010,
+      nombre: 'Leo',
+      raza: 'Humano',
+      ubicacion: 'Ofra',
+    };
+    await request(app).post('/hunters').send(nuevoHunter);
+  
+    // Modificar
+    const response = await request(app)
+      .patch('/hunters')
+      .send({ nombre: 'Leo', raza: 'Mutante', ubicacion: 'Chimisai' });
+  
+    expect(response.status).toBe(200);
+    expect(response.body.raza).toBe('Mutante');
+    expect(response.body.ubicacion).toBe('Chimisai');
+  });  
+  
+  test('Eliminar un hunter por nombre', async () => {
+    const response = await request(app)
+      .delete('/hunters')
+      .send({ nombre: hunterData.nombre });
+
+    expect(response.status).toBe(200);
+    expect(response.body.mensaje).toMatch(/eliminado/i);
   });
 
-  test("DELETE /hunters        → elimina el cazador", async () => {
-    const res = await request(app).delete(baseURL).send({ _id: createdId });
-    expect(res.status).toBe(200);
-    expect(res.body).toEqual({ mensaje: "Eliminado" });
+  test('Error al crear un hunter con ID duplicado', async () => {
+    const hunter = {
+      ID: 1234,
+      nombre: 'Carlos',
+      raza: 'Humano',
+      ubicacion: 'Igueste'
+    };
+
+    const first = await request(app).post('/hunters').send(hunter);
+    expect(first.status).toBe(200);
+
+    const second = await request(app).post('/hunters').send(hunter);
+    expect(second.status).toBe(400);
   });
 
-  test("GET    /hunters?_id=id  → 404 tras borrarlo", async () => {
-    const res = await request(app).get(`${baseURL}?_id=${createdId}`);
-    expect(res.status).toBe(404);
+  test('Error al modificar un hunter inexistente', async () => {
+    const response = await request(app)
+      .patch('/hunters')
+      .send({
+        nombre: 'Inexistente',
+        ubicacion: 'Radazul'
+      });
+
+    expect(response.status).toBe(404);
+    expect(response.body.error).toMatch(/no encontrado/i);
   });
 });

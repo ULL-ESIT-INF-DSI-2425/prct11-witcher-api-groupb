@@ -50,7 +50,7 @@ router.patch("/merchants", async (req, res) => {
   }
 
   try {
-    const merchant = await Merchant.findOneAndUpdate({ filter }, req.body, {
+    const merchant = await Merchant.findOneAndUpdate(filter, req.body, {
       new: true,
       runValidators: true,
     });
@@ -84,7 +84,7 @@ router.delete("/merchants", async (req, res) => {
       { persona: merchant._id, tipoPersona: "MerchantsModel" },
       {
         $set: {
-          persona: "UsuarioEliminado",
+          persona: null,
           tipoPersona: "UsuarioEliminado",
         },
       },

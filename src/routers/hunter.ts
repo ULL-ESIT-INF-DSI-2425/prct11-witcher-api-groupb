@@ -50,7 +50,7 @@ router.patch("/hunters", async (req, res) => {
   }
 
   try {
-    const hunter = await Hunter.findOneAndUpdate({ filter }, req.body, {
+    const hunter = await Hunter.findOneAndUpdate(filter, req.body, {
       new: true,
       runValidators: true,
     });
@@ -84,7 +84,7 @@ router.delete("/hunters", async (req, res) => {
       { persona: hunter._id, tipoPersona: "HuntersModel" },
       {
         $set: {
-          persona: "UsuarioEliminado",
+          persona: null,
           tipoPersona: "UsuarioEliminado",
         },
       },
@@ -94,7 +94,7 @@ router.delete("/hunters", async (req, res) => {
 
     res.send({ mensaje: "Eliminado" });
   } catch (error) {
-    res.status(500).send({ error });
+    res.status(500).send(error);
   }
 });
 
