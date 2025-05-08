@@ -96,9 +96,7 @@ router.get('/transactions', async (req, res) => {
       };
     }
 
-    const transacciones = await Transaccion.find(filter)
-      .populate('persona')
-      .populate('bienes.bien');
+    const transacciones = await Transaccion.find(filter).populate('bienes.bien');
 
     if (!transacciones.length) {
       res.status(404).send({ error: 'No hay transacciones' });

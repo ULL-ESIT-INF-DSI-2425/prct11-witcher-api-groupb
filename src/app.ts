@@ -8,8 +8,6 @@ import merchantsRouter from './routers/merchant.js';
 import transactionsRouter from './routers/transactions.js';
 import bienRouter from './routers/bien.js';
 
-// Añadir los demas routers aqui (Peticiones)
-
 export const app = express();
 const port = 3000;
 

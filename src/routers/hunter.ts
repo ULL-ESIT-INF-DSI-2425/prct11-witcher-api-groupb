@@ -1,5 +1,6 @@
 import express from 'express';
 import Hunter from '../models/HuntersModel.js';
+import Transaccion from '../models/TransaccionModel.js';
 
 const router = express.Router();
 
@@ -71,10 +72,23 @@ router.delete('/hunters', async (req, res) => {
 
   try {
 
-    const hunter = await Hunter.findOneAndDelete({ filter });
+    const hunter = await Hunter.findOne(filter);
     if(!hunter) {
       res.status(404).send({ error: 'No encontrado' });
+      return;
     }
+
+    await Transaccion.updateMany(
+      { persona: hunter._id, tipoPersona: 'HuntersModel' },
+      {
+        $set: {
+          persona: 'UsuarioEliminado',
+          tipoPersona: 'UsuarioEliminado'
+        }
+      }
+    );
+
+    await hunter.deleteOne();
 
     res.send({ mensaje: 'Eliminado' });
   } catch (error) {
