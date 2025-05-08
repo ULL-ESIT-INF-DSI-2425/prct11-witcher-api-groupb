@@ -25,10 +25,10 @@ export const app = express();
 app.use(express.json());
 
 // Rutas
-app.use("/hunter", huntersRouter);
-app.use("/merchant", merchantsRouter);
-app.use("/transaction", transactionsRouter);
-app.use("/bien", bienRouter);
+app.use(huntersRouter);
+app.use(merchantsRouter);
+app.use(transactionsRouter);
+app.use(bienRouter);
 
 // Control
 app.use(defaultRouter);
