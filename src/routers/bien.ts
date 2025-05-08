@@ -1,10 +1,10 @@
-import express from 'express';
-import Bien from '../models/BienModel.js';
+import express from "express";
+import Bien from "../models/BienModel.js";
 
 const router = express.Router();
 
 // Crear bien
-router.post('/bienes', async (req, res) => {
+router.post("/bienes", async (req, res) => {
   const bien = new Bien(req.body);
 
   try {
@@ -16,7 +16,7 @@ router.post('/bienes', async (req, res) => {
 });
 
 // Obtener bien-bienes
-router.get('/bienes', async (req, res) => {
+router.get("/bienes", async (req, res) => {
   let filter = {};
 
   if (req.query.nombre) {
@@ -28,7 +28,7 @@ router.get('/bienes', async (req, res) => {
   try {
     const bienes = await Bien.find(filter);
     if (!bienes.length) {
-      res.status(404).send({ error: 'No se encontraron bienes' });
+      res.status(404).send({ error: "No se encontraron bienes" });
     }
     res.send(bienes);
   } catch (error) {
@@ -37,21 +37,23 @@ router.get('/bienes', async (req, res) => {
 });
 
 // Modificar bien
-router.patch('/bienes', async (req, res) => {
-  const filter = req.body.nombre ? { nombre: req.body.nombre.toString() } : { _id: req.body._id };
+router.patch("/bienes", async (req, res) => {
+  const filter = req.body.nombre
+    ? { nombre: req.body.nombre.toString() }
+    : { _id: req.body._id };
 
   if (!filter) {
-    res.status(400).send({ error: 'Falta el nombre o id del bien' });
+    res.status(400).send({ error: "Falta el nombre o id del bien" });
   }
 
   try {
     const bien = await Bien.findOneAndUpdate(filter, req.body, {
       new: true,
-      runValidators: true
+      runValidators: true,
     });
 
     if (!bien) {
-      res.status(404).send({ error: 'Bien no encontrado' });
+      res.status(404).send({ error: "Bien no encontrado" });
     }
 
     res.send(bien);
@@ -61,21 +63,23 @@ router.patch('/bienes', async (req, res) => {
 });
 
 // Borrar bien
-router.delete('/bienes', async (req, res) => {
-  const filter = req.body.nombre ? { nombre: req.body.nombre.toString() } : { _id: req.body._id };
+router.delete("/bienes", async (req, res) => {
+  const filter = req.body.nombre
+    ? { nombre: req.body.nombre.toString() }
+    : { _id: req.body._id };
 
   if (!filter) {
-    res.status(400).send({ error: 'Falta el nombre o id del bien' });
+    res.status(400).send({ error: "Falta el nombre o id del bien" });
   }
 
   try {
     const bien = await Bien.findOneAndDelete(filter);
 
     if (!bien) {
-      res.status(404).send({ error: 'Bien no encontrado' });
+      res.status(404).send({ error: "Bien no encontrado" });
     }
 
-    res.send({ mensaje: 'Bien eliminado correctamente' });
+    res.send({ mensaje: "Bien eliminado correctamente" });
   } catch (error) {
     res.status(500).send(error);
   }

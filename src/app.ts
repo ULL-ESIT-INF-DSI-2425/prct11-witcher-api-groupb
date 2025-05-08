@@ -1,23 +1,34 @@
-import express from 'express';
-import './db/mongoose.js'; // Se conecta a MongoDB local
+import express from "express";
+import mongoose from "mongoose";
 
-// Routers: 
+const MONGO_URL =
+  process.env.MONGO_URL || "mongodb://127.0.0.1:27017/posada-app";
+
+// Middleware para manejar errores
+if (process.env.NODE_ENV !== "test") {
+  mongoose
+    .connect(MONGO_URL)
+    .then(() => console.log("✅ Connected to the database"))
+    .catch(() => console.log("❌ Error connecting to the database"));
+}
+
+// Routers:
 import { defaultRouter } from "./routers/default.js";
-import huntersRouter from './routers/hunter.js';
-import merchantsRouter from './routers/merchant.js';
-import transactionsRouter from './routers/transactions.js';
-import bienRouter from './routers/bien.js';
+import huntersRouter from "./routers/hunter.js";
+import merchantsRouter from "./routers/merchant.js";
+import transactionsRouter from "./routers/transactions.js";
+import bienRouter from "./routers/bien.js";
 
 export const app = express();
-const port = 3000;
+// const port = 3000;
 
 app.use(express.json());
 
 // Rutas
-app.use('/hunter', huntersRouter);
-app.use('/merchant', merchantsRouter);
-app.use('/transaction', transactionsRouter);
-app.use('/bien', bienRouter);
+app.use("/hunter", huntersRouter);
+app.use("/merchant", merchantsRouter);
+app.use("/transaction", transactionsRouter);
+app.use("/bien", bienRouter);
 
 // Control
 app.use(defaultRouter);

@@ -1,11 +1,11 @@
-import express from 'express';
-import Hunter from '../models/HuntersModel.js';
-import Transaccion from '../models/TransaccionModel.js';
+import express from "express";
+import Hunter from "../models/HuntersModel.js";
+import Transaccion from "../models/TransaccionModel.js";
 
 const router = express.Router();
 
 // Crear
-router.post('/hunters', async (req, res) => {
+router.post("/hunters", async (req, res) => {
   const hunter = new Hunter(req.body);
 
   try {
@@ -17,15 +17,13 @@ router.post('/hunters', async (req, res) => {
 });
 
 // Obtener
-router.get('/hunters', async (req, res) => {
-
+router.get("/hunters", async (req, res) => {
   let filter;
   if (req.query.nombre) {
     filter = { nombre: req.query.nombre.toString() };
   } else if (req.query._id) {
     filter = { _id: req.query._id };
-  }
-  else {
+  } else {
     filter = {};
   }
 
@@ -42,18 +40,22 @@ router.get('/hunters', async (req, res) => {
   }
 });
 
-
 // Modificar
-router.patch('/hunters', async (req, res) => {
-  const filter = req.body.nombre ? { nombre: req.body.nombre.toString() } : { _id: req.body._id };
-  if(!filter) {
-    res.status(400).send({ error: 'Falta el nombre o id' });
+router.patch("/hunters", async (req, res) => {
+  const filter = req.body.nombre
+    ? { nombre: req.body.nombre.toString() }
+    : { _id: req.body._id };
+  if (!filter) {
+    res.status(400).send({ error: "Falta el nombre o id" });
   }
 
   try {
-    const hunter = await Hunter.findOneAndUpdate({ filter }, req.body, { new: true, runValidators: true });
-    if(!hunter) {
-      res.status(404).send({ error: 'No encontrado' });
+    const hunter = await Hunter.findOneAndUpdate({ filter }, req.body, {
+      new: true,
+      runValidators: true,
+    });
+    if (!hunter) {
+      res.status(404).send({ error: "No encontrado" });
     }
 
     res.send(hunter);
@@ -62,39 +64,38 @@ router.patch('/hunters', async (req, res) => {
   }
 });
 
-
 // Borrar
-router.delete('/hunters', async (req, res) => {
-  const filter = req.body.nombre ? { nombre: req.body.nombre.toString() } : { _id: req.body._id };
-  if(!filter) {
-    res.status(400).send({ error: 'Falta el nombre o id' });
- }
+router.delete("/hunters", async (req, res) => {
+  const filter = req.body.nombre
+    ? { nombre: req.body.nombre.toString() }
+    : { _id: req.body._id };
+  if (!filter) {
+    res.status(400).send({ error: "Falta el nombre o id" });
+  }
 
   try {
-
     const hunter = await Hunter.findOne(filter);
-    if(!hunter) {
-      res.status(404).send({ error: 'No encontrado' });
+    if (!hunter) {
+      res.status(404).send({ error: "No encontrado" });
       return;
     }
 
     await Transaccion.updateMany(
-      { persona: hunter._id, tipoPersona: 'HuntersModel' },
+      { persona: hunter._id, tipoPersona: "HuntersModel" },
       {
         $set: {
-          persona: 'UsuarioEliminado',
-          tipoPersona: 'UsuarioEliminado'
-        }
-      }
+          persona: "UsuarioEliminado",
+          tipoPersona: "UsuarioEliminado",
+        },
+      },
     );
 
     await hunter.deleteOne();
 
-    res.send({ mensaje: 'Eliminado' });
+    res.send({ mensaje: "Eliminado" });
   } catch (error) {
     res.status(500).send({ error });
   }
 });
-
 
 export default router;

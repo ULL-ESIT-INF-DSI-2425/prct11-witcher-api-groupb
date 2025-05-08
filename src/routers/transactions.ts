@@ -1,46 +1,46 @@
-import express from 'express';
-import Transaccion from '../models/TransaccionModel.js';
-import Hunter from '../models/HuntersModel.js';
-import Merchant from '../models/MerchantModel.js';
-import Bien from '../models/BienModel.js';
+import express from "express";
+import Transaccion from "../models/TransaccionModel.js";
+import Hunter from "../models/HuntersModel.js";
+import Merchant from "../models/MerchantModel.js";
+import Bien from "../models/BienModel.js";
 
 const router = express.Router();
 
 // Crear transacción
-router.post('/transactions', async (req, res) => {
+router.post("/transactions", async (req, res) => {
   const { nombrePersona, tipoPersona, bienes, devolucion = false } = req.body;
 
   try {
     let persona;
     let tipoModelo;
 
-    if (tipoPersona === 'Hunter') {
+    if (tipoPersona === "Hunter") {
       persona = await Hunter.findOne({ nombre: nombrePersona });
-      tipoModelo = 'HuntersModel';
+      tipoModelo = "HuntersModel";
     } else {
       persona = await Merchant.findOne({ nombre: nombrePersona });
-      tipoModelo = 'MerchantsModel';
+      tipoModelo = "MerchantsModel";
     }
 
     if (!persona) {
-      res.status(404).send({ error: '${tipoPersona} no encontrado' });
+      res.status(404).send({ error: "${tipoPersona} no encontrado" });
       return;
     }
 
     const bien = await Bien.findOne({ nombre: bienes.nombre });
 
     if (!bien) {
-      res.status(404).send({ error: 'Bien no encontrado' });
+      res.status(404).send({ error: "Bien no encontrado" });
       return;
     }
 
-    if (tipoPersona === 'Hunter' && bien.stock < bienes.cantidad) {
-      res.status(400).send({ error: 'Stock insuficiente' });
+    if (tipoPersona === "Hunter" && bien.stock < bienes.cantidad) {
+      res.status(400).send({ error: "Stock insuficiente" });
     }
 
     const dinero = bien.precio * bienes.cantidad;
 
-    if (tipoPersona === 'Hunter') {
+    if (tipoPersona === "Hunter") {
       bien.stock -= bienes.cantidad;
     } else {
       bien.stock += bienes.cantidad;
@@ -52,10 +52,10 @@ router.post('/transactions', async (req, res) => {
       tipoPersona: tipoModelo,
       bienes: {
         bien: bien._id,
-        cantidad: bienes.cantidad
+        cantidad: bienes.cantidad,
       },
       devolucion,
-      dinero
+      dinero,
     });
 
     await transaccion.save();
@@ -66,7 +66,7 @@ router.post('/transactions', async (req, res) => {
 });
 
 // Obtener transacciones
-router.get('/transactions', async (req, res) => {
+router.get("/transactions", async (req, res) => {
   const { _id, nombre, tipoPersona } = req.query;
   let filter = {};
 
@@ -77,29 +77,30 @@ router.get('/transactions', async (req, res) => {
       let persona;
       let tipoModelo;
 
-      if (tipoPersona === 'Hunter') {
+      if (tipoPersona === "Hunter") {
         persona = await Hunter.findOne({ nombre: nombre.toString() });
-        tipoModelo = 'HuntersModel';
+        tipoModelo = "HuntersModel";
       } else {
         persona = await Merchant.findOne({ nombre: nombre.toString() });
-        tipoModelo = 'MerchantsModel';
+        tipoModelo = "MerchantsModel";
       }
 
       if (!persona) {
-        res.status(404).send({ error: 'Persona no encontrada' });
+        res.status(404).send({ error: "Persona no encontrada" });
         return;
       }
 
       filter = {
         persona: persona._id,
-        tipoPersona: tipoModelo
+        tipoPersona: tipoModelo,
       };
     }
 
-    const transacciones = await Transaccion.find(filter).populate('bienes.bien');
+    const transacciones =
+      await Transaccion.find(filter).populate("bienes.bien");
 
     if (!transacciones.length) {
-      res.status(404).send({ error: 'No hay transacciones' });
+      res.status(404).send({ error: "No hay transacciones" });
       return;
     }
 
@@ -110,33 +111,33 @@ router.get('/transactions', async (req, res) => {
 });
 
 // Modificar transacción
-router.patch('/transactions', async (req, res) => {
+router.patch("/transactions", async (req, res) => {
   const { _id, nuevaCantidad } = req.body;
 
   if (!_id || !nuevaCantidad) {
-    res.status(400).send({ error: 'Faltan campos' });
+    res.status(400).send({ error: "Faltan campos" });
     return;
   }
 
   try {
-    const transaccion = await Transaccion.findById(_id).populate('bienes.bien');
+    const transaccion = await Transaccion.findById(_id).populate("bienes.bien");
 
     if (!transaccion) {
-      res.status(404).send({ error: 'Transacción no encontrada' });
+      res.status(404).send({ error: "Transacción no encontrada" });
       return;
     }
 
     const bien = await Bien.findById(transaccion.bienes.bien._id);
     if (!bien) {
-      res.status(404).send({ error: 'Bien no encontrado' });
+      res.status(404).send({ error: "Bien no encontrado" });
       return;
     }
 
     const diferencia = nuevaCantidad - transaccion.bienes.cantidad;
 
-    if (transaccion.tipoPersona === 'HuntersModel') {
+    if (transaccion.tipoPersona === "HuntersModel") {
       if (bien.stock < diferencia) {
-        res.status(400).send({ error: 'Stock insuficiente' });
+        res.status(400).send({ error: "Stock insuficiente" });
         return;
       }
       bien.stock -= diferencia;
@@ -157,27 +158,27 @@ router.patch('/transactions', async (req, res) => {
 });
 
 // Borrar transacción
-router.delete('/transactions', async (req, res) => {
+router.delete("/transactions", async (req, res) => {
   const { _id } = req.body;
   if (!_id) {
-    res.status(400).send({ error: 'Falta el ID de la transacción' });
+    res.status(400).send({ error: "Falta el ID de la transacción" });
     return;
   }
 
   try {
-    const transaccion = await Transaccion.findById(_id).populate('bienes.bien');
+    const transaccion = await Transaccion.findById(_id).populate("bienes.bien");
     if (!transaccion) {
-      res.status(404).send({ error: 'Transacción no encontrada' });
+      res.status(404).send({ error: "Transacción no encontrada" });
       return;
     }
 
     const bien = await Bien.findById(transaccion.bienes.bien._id);
     if (!bien) {
-      res.status(404).send({ error: 'Bien no encontrado' });
+      res.status(404).send({ error: "Bien no encontrado" });
       return;
     }
 
-    if (transaccion.tipoPersona === 'HuntersModel') {
+    if (transaccion.tipoPersona === "HuntersModel") {
       bien.stock += transaccion.bienes.cantidad;
     } else {
       bien.stock -= transaccion.bienes.cantidad;
@@ -186,7 +187,7 @@ router.delete('/transactions', async (req, res) => {
     await bien.save();
     await transaccion.deleteOne();
 
-    res.send({ mensaje: 'Transacción eliminada y stock actualizado' });
+    res.send({ mensaje: "Transacción eliminada y stock actualizado" });
   } catch (error) {
     res.status(500).send(error);
   }
