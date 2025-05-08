@@ -16,16 +16,6 @@ router.post('/merchants', async (req, res) => {
   }
 });
 
-// Obtener todos
-router.get('/merchants', async (_, res) => {
-  try {
-    const merchant = await Merchant.find();
-    res.send(merchant);
-  } catch (error) {
-    res.status(500).send(error);
-  }
-});
-
 // Obtener
 router.get('/merchants', async (req, res) => {
 
